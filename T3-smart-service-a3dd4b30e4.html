@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>首都机场T3智慧服务 · 完整版</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+
+    html,
+    body {
+      font-size: 18px;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 380px 140px at 12% 7%, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 240px 100px at 10% 4%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 160px 70px at 20% 10%, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 420px 160px at 78% 9%, rgba(255, 255, 255, 0.90) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 280px 110px at 82% 5%, rgba(255, 255, 255, 0.93) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 180px 80px at 72% 13%, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 320px 120px at 35% 30%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 200px 80px at 65% 42%, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 350px 100px at 20% 65%, rgba(255, 255, 255, 0.30) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 280px 90px at 80% 72%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 100%),
+        radial-gradient(ellipse 200px 70px at 50% 85%, rgba(255, 255, 255, 0.20) 0%, rgba(255, 255, 255, 0) 100%),
+        linear-gradient(180deg, #6AADDF 0%, #8DC8ED 25%, #B0DDF5 50%, #D2ECFA 75%, #E8F4FC 100%);
+      background-attachment: fixed;
+    }
+
+    /* 身份证页面 */
+    #idCardPage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: linear-gradient(180deg, #0077cc 0%, #005599 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      color: white;
+      padding: 30px;
+    }
+
+    .id-title {
+      font-size: 52px;
+      font-weight: bold;
+      margin-bottom: 40px;
+      text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .id-card-area {
+      width: 420px;
+      height: 260px;
+      border: 4px dashed #fff;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 50px;
+      background: rgba(255, 255, 255, 0.1);
+      animation: pulse 2s infinite ease-in-out;
+      cursor: pointer;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        border-color: #fff;
+      }
+
+      50% {
+        transform: scale(1.03);
+        border-color: #a8dfff;
+      }
+
+      100% {
+        transform: scale(1);
+        border-color: #fff;
+      }
+    }
+
+    .id-icon {
+      font-size: 80px;
+    }
+
+    .id-tip {
+      font-size: 32px;
+      font-weight: 500;
+    }
+
+    .id-success-box {
+      display: none;
+      text-align: center;
+    }
+
+    .id-success-text {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 40px;
+    }
+
+    .id-confirm-btn {
+      padding: 24px 60px;
+      font-size: 30px;
+      font-weight: bold;
+      background: #fff;
+      color: #005599;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      transition: 0.2s;
+    }
+
+    .id-confirm-btn:hover {
+      transform: translateY(-4px);
+      background: #f0f7ff;
+    }
+
+    /* 主应用 */
+    #mainApp {
+      display: none;
+      position: relative;
+      z-index: 1;
+      width: 100vw;
+      height: 100vh;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .top-banner {
+      width: 100%;
+      height: 62px;
+      padding: 0 30px;
+      background: linear-gradient(135deg, #0D47A1 0%, #1565C0 50%, #0D47A1 100%);
+      color: white;
+      font-size: 26px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
+    }
+
+    .main-body {
+      flex: 1;
+      display: flex;
+      padding: 16px;
+      gap: 20px;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* 左侧导航 - 调大宽度 */
+    .left-panel {
+      width: 300px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      border-radius: 24px;
+      border: 1.5px solid rgba(100, 160, 220, 0.5);
+      padding: 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+    .left-panel-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #0D47A1;
+      border-bottom: 2px solid #90CAF9;
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .func-btn {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1.5px solid #c8e1f5;
+      border-radius: 16px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #0D47A1;
+      font-weight: 600;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .func-btn:hover {
+      background: #1565C0;
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .func-icon {
+      font-size: 24px;
+      min-width: 32px;
+      text-align: center;
+    }
+
+    .func-label {
+      flex: 1;
+    }
+
+    .func-btn-checkin {
+      background: linear-gradient(135deg, #1565C0, #0D47A1);
+      color: white;
+      border: none;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    /* 中间地图区 */
+    .center-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .map-card {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      border-radius: 24px;
+      border: 1.5px solid rgba(100, 160, 220, 0.5);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .map-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0D47A1;
+      margin-bottom: 8px;
+    }
+
+    .map-container {
+      flex: 1;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid rgba(100, 160, 220, 0.3);
+    }
+
+    #mapContainer {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .ctrl-bar {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      border-radius: 60px;
+      border: 1.5px solid rgba(100, 160, 220, 0.5);
+      padding: 12px 24px;
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .mic-btn {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1565C0, #0D47A1);
+      border: 2.5px solid #0A3A80;
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .stop-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1.5px solid #c8e1f5;
+      padding: 12px 28px;
+      border-radius: 40px;
+      font-size: 16px;
+      color: #0D47A1;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* 右侧对话 - 调大宽度 */
+    .right-panel {
+      width: 450px;
+      flex-shrink: 0;
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(18px);
+      border-radius: 24px;
+      border: 1.5px solid rgba(100, 160, 220, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #0D47A1, #1565C0);
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .captain-avatar svg {
+      width: 56px;
+      height: 56px;
+    }
+
+    .chat-header-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .chat-header-sub {
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chat-bubble {
+      max-width: 92%;
+      padding: 14px 20px;
+      border-radius: 24px;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+
+    .user-bubble {
+      background: linear-gradient(135deg, #1565C0, #0D47A1);
+      color: white;
+      align-self: flex-end;
+    }
+
+    .system-bubble {
+      background: rgba(255, 255, 255, 0.95);
+      color: #1e293b;
+      align-self: flex-start;
+      border: 1px solid #b9d9ff;
+    }
+
+    /* 老人模式 */
+    .elder-mode .chat-bubble {
+      font-size: 24px !important;
+      padding: 18px 24px !important;
+    }
+
+    .elder-mode .func-btn {
+      font-size: 20px !important;
+      padding: 16px !important;
+    }
+
+    /* 地图 marker */
+    .custom-marker {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .custom-marker:hover {
+      transform: scale(1.1);
+    }
+
+    .marker-checkin {
+      background: #0077cc;
+    }
+
+    .marker-security {
+      background: #0066aa;
+    }
+
+    .marker-gate {
+      background: #009966;
+    }
+
+    .marker-toilet {
+      background: #3399cc;
+    }
+
+    .marker-shop {
+      background: #9933cc;
+    }
+
+    .marker-restaurant {
+      background: #ff9933;
+    }
+
+    .marker-baggage {
+      background: #0099cc;
+    }
+
+    .marker-lost {
+      background: #666;
+    }
+
+    .marker-special {
+      background: #ff6699;
+    }
+
+    .marker-transport {
+      background: #6633cc;
+    }
+
+    /* 模态框通用 */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+    }
+
+    .modal-content {
+      background: white;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* 安全须知 */
+    .safety-header {
+      background: #0D47A1;
+      color: white;
+      padding: 22px 30px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .safety-header h2 {
+      font-size: 28px;
+    }
+
+    .safety-tip {
+      background: #E3F2FD;
+      padding: 14px 28px;
+      font-size: 18px;
+      color: #0D47A1;
+    }
+
+    .safety-tip span {
+      font-weight: bold;
+      color: #ff6600;
+    }
+
+    .safety-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px;
+      line-height: 1.8;
+      font-size: 18px;
+    }
+
+    .safety-btn-group {
+      padding: 20px 28px;
+      display: flex;
+      gap: 20px;
+      justify-content: flex-end;
+      background: #f8f8f8;
+    }
+
+    .safety-btn {
+      padding: 14px 32px;
+      border: none;
+      border-radius: 40px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .safety-btn-back {
+      background: #E3F2FD;
+      color: #0D47A1;
+      border: 2px solid #90CAF9;
+    }
+
+    .safety-btn-next {
+      background: #E3F2FD;
+      color: #0D47A1;
+      border: 2px solid #90CAF9;
+    }
+
+    .safety-btn-next.active {
+      background: #1565C0;
+      color: white;
+    }
+
+    /* 选座弹窗 (原始样式，完整) */
+    .seat-modal-content {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .seat-nav {
+      background: linear-gradient(135deg, #0D47A1, #1565C0);
+      padding: 18px 30px;
+      display: flex;
+      justify-content: space-between;
+      color: white;
+    }
+
+    .seat-nav-title h2 {
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .flight-info {
+      display: flex;
+      gap: 30px;
+      font-size: 18px;
+    }
+
+    .seat-main-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .seat-list-area {
+      width: 38%;
+      background: #f8fafc;
+      border-right: 2px solid #e0e8f0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .seat-filter-bar {
+      background: white;
+      padding: 16px 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #e0e8f0;
+    }
+
+    .filter-btn {
+      padding: 10px 18px;
+      border-radius: 25px;
+      border: 2px solid #90CAF9;
+      background: white;
+      color: #0D47A1;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .filter-btn.active {
+      background: #1565C0;
+      color: white;
+    }
+
+    .seat-cards-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .seat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: 0.1s;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .seat-card:hover {
+      transform: translateY(-2px);
+      border-color: #90CAF9;
+    }
+
+    .seat-card.selected {
+      border-color: #f44336;
+      background: #fff5f0;
+    }
+
+    .seat-card.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .seat-number {
+      font-size: 26px;
+      font-weight: bold;
+      color: #0D47A1;
+    }
+
+    .seat-type-badge {
+      padding: 5px 12px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .seat-type-available {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .seat-type-popular {
+      background: #fff3e0;
+      color: #e65100;
+    }
+
+    .seat-type-cheap {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .seat-type-exit {
+      background: #fffde7;
+      color: #f9a825;
+    }
+
+    .seat-type-occupied {
+      background: #fafafa;
+      color: #999;
+    }
+
+    .seat-price {
+      margin-top: 12px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #1565C0;
+    }
+
+    .plane-view-area {
+      flex: 1;
+      background: linear-gradient(180deg, #f0f7ff, #e6f2ff);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .plane-top-view {
+      position: relative;
+      width: 380px;
+      height: 620px;
+      margin-bottom: 20px;
+    }
+
+    .plane-body {
+      width: 100%;
+      height: 100%;
+      background: #fafafa;
+      border-radius: 100px 100px 50px 50px;
+      border: 5px solid #1565C0;
+      position: relative;
+      overflow: visible;
+    }
+
+    .plane-nose {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px;
+      height: 60px;
+      background: #1976d2;
+      border-radius: 50%;
+    }
+
+    .plane-tail {
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 50px;
+      background: #0d47a1;
+      border-radius: 20px;
+    }
+
+    .plane-wing-left {
+      position: absolute;
+      top: 35%;
+      left: -60px;
+      width: 80px;
+      height: 100px;
+      background: #1976d2;
+      border-radius: 30px 0 0 30px;
+      transform: rotate(-10deg);
+    }
+
+    .plane-wing-right {
+      position: absolute;
+      top: 35%;
+      right: -60px;
+      width: 80px;
+      height: 100px;
+      background: #1976d2;
+      border-radius: 0 30px 30px 0;
+      transform: rotate(10deg);
+    }
+
+    .cabin-section {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 5px 16px;
+      border-radius: 12px;
+      background: white;
+      border: 2px solid #90CAF9;
+      font-size: 14px;
+      font-weight: bold;
+      color: #0D47A1;
+    }
+
+    .cabin-front {
+      top: 12%;
+    }
+
+    .cabin-middle {
+      top: 45%;
+    }
+
+    .cabin-back {
+      bottom: 10%;
+    }
+
+    #planeSeatsContainer {
+      position: absolute;
+      top: 10%;
+      left: 5%;
+      width: 90%;
+      height: 80%;
+    }
+
+    .seat-dot {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: 0.1s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+
+    .seat-dot.available {
+      background: #4caf50;
+    }
+
+    .seat-dot.popular {
+      background: #ff9800;
+    }
+
+    .seat-dot.cheap {
+      background: #2196f3;
+    }
+
+    .seat-dot.exit {
+      background: #ffc107;
+      color: #333;
+    }
+
+    .seat-dot.occupied {
+      background: #9e9e9e;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .seat-dot.selected {
+      background: #e53935;
+      transform: scale(1.2);
+      border: 2px solid white;
+      z-index: 20;
+    }
+
+    .seat-legend {
+      margin-top: 16px;
+      background: white;
+      border-radius: 20px;
+      padding: 16px 20px;
+      width: 100%;
+      max-width: 380px;
+      border: 1px solid #c8e1f5;
+    }
+
+    .legend-title {
+      font-weight: 700;
+      color: #0D47A1;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .legend-color {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+    }
+
+    .seat-bottom-bar {
+      background: white;
+      padding: 18px 28px;
+      display: flex;
+      justify-content: space-between;
+      border-top: 2px solid #e0e8f0;
+    }
+
+    .summary-item {
+      display: flex;
+      gap: 10px;
+      color: #666;
+      font-size: 17px;
+    }
+
+    .summary-item .value {
+      color: #1565C0;
+      font-weight: 700;
+      font-size: 22px;
+    }
+
+    .seat-btn-back {
+      padding: 14px 32px;
+      background: #E3F2FD;
+      border: 2px solid #90CAF9;
+      border-radius: 40px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      color: #0D47A1;
+    }
+
+    .seat-btn-confirm {
+      padding: 14px 38px;
+      background: #1565C0;
+      border: none;
+      border-radius: 40px;
+      font-size: 18px;
+      font-weight: 600;
+      color: white;
+      cursor: pointer;
+    }
+
+    .seat-btn-confirm:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .selected-seat-toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0d47a1;
+      color: white;
+      padding: 12px 30px;
+      border-radius: 60px;
+      opacity: 0;
+      transition: 0.2s;
+      z-index: 100001;
+    }
+
+    .selected-seat-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-20px);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="idCardPage">
+    <div class="id-title">✈️ 首都机场T3自助服务</div>
+    <div class="id-card-area" id="idCardArea">
+      <div class="id-icon">🪪</div>
+      <div class="id-tip">请将身份证放置感应区</div>
+    </div>
+    <div class="id-success-box" id="idSuccessBox">
+      <div class="id-success-text">身份识别成功，请确认身份进入</div>
+      <button class="id-confirm-btn" id="idConfirmBtn">确认进入系统</button>
+    </div>
+  </div>
+
+  <div id="mainApp">
+    <div class="top-banner"><span>✈️</span> 首都机场T3智慧服务 · 全流程陪伴</div>
+    <div class="main-body">
+      <div class="left-panel">
+        <div class="left-panel-title">📍 快捷导航</div>
+        <div class="func-btn func-btn-checkin" data-cmd="checkin"><span class="func-icon">🛄</span><span
+            class="func-label">在线值机 · 选座</span></div>
+        <div class="func-btn" data-cmd="security"><span class="func-icon">🔍</span><span class="func-label">安检区</span>
+        </div>
+        <div class="func-btn" data-cmd="gate"><span class="func-icon">🚪</span><span class="func-label">登机口A12</span>
+        </div>
+        <div class="func-btn" data-cmd="restaurant"><span class="func-icon">🍽️</span><span class="func-label">餐厅</span>
+        </div>
+        <div class="func-btn" data-cmd="toilet"><span class="func-icon">🚻</span><span class="func-label">卫生间</span>
+        </div>
+        <div class="func-btn" data-cmd="shop"><span class="func-icon">🛍️</span><span class="func-label">免税店</span>
+        </div>
+        <div class="func-btn" data-cmd="baggage"><span class="func-icon">🧳</span><span class="func-label">行李提取</span>
+        </div>
+        <div class="func-btn" data-cmd="lost"><span class="func-icon">🔎</span><span class="func-label">失物招领</span>
+        </div>
+        <div class="func-btn" data-cmd="special"><span class="func-icon">👴</span><span class="func-label">特殊旅客</span>
+        </div>
+        <div class="func-btn" data-cmd="transport"><span class="func-icon">🚌</span><span class="func-label">交通中心</span>
+        </div>
+      </div>
+
+      <div class="center-panel">
+        <div class="map-card">
+          <div class="map-title">🗺️ 航站楼动态地图 · 点击地标可导航</div>
+          <div class="map-container">
+            <div id="mapContainer"></div>
+          </div>
+        </div>
+        <div class="ctrl-bar">
+          <button class="mic-btn" id="micBtn">🎤</button>
+          <button class="stop-btn" id="stopBtn">⏹️ 停止播报</button>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="chat-header">
+          <div class="captain-avatar"><svg viewBox="0 0 100 100" width="48" height="48">
+              <rect x="22" y="12" width="56" height="8" rx="3" fill="#fff" />
+              <rect x="28" y="4" width="44" height="16" rx="5" fill="#fff" />
+              <ellipse cx="50" cy="44" rx="24" ry="22" fill="#f5d0a9" />
+              <circle cx="40" cy="42" r="2.5" fill="#1a237e" />
+              <circle cx="61" cy="42" r="2.5" fill="#1a237e" />
+              <path d="M40 56 Q50 65 60 56" stroke="#c17a50" stroke-width="2.5" fill="none" />
+            </svg></div>
+          <div>
+            <div class="chat-header-title">✈️ 机长智能助手</div>
+            <div class="chat-header-sub">语音/触控 随时服务</div>
+          </div>
+        </div>
+        <div class="chat-box" id="chatBox">
+          <div class="chat-bubble system-bubble">✈️ 欢迎使用首都机场T3智慧服务</div>
+          <div class="chat-bubble system-bubble">🎤 点击麦克风说话，或点击下方按钮导航</div>
+          <div class="chat-bubble system-bubble">👴 语音指令：老人机模式 → 字体放大</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="safetyModal">
+    <div class="modal-content"><span class="modal-close"
+        style="position:absolute;right:20px;top:15px;font-size:36px;cursor:pointer;z-index:99;"
+        id="safetyClose">✕</span>
+      <div class="safety-header"><span style="font-size:32px">✈️</span>
+        <h2>航班安全须知</h2>
+      </div>
+      <div class="safety-tip">请仔细阅读，<span id="countdown">5</span>秒后可进入选座</div>
+      <div class="safety-content">
+        <h3>⚠️ 1. 紧急出口位置</h3>
+        <p>位于12-13排，请勿放置行李。</p>
+        <h3>🫁 2. 氧气面罩</h3>
+        <p>先戴好自己的面罩再帮助他人。</p>
+        <h3>🔒 3. 全程系好安全带</h3>
+        <p>遇颠簸立即坐好。</p>
+        <h3>🦺 4. 救生衣</h3>
+        <p>离开飞机后再充气。</p>
+        <h3>🚭 5. 禁止吸烟</h3>
+        <p>机舱全程禁烟。</p>
+      </div>
+      <div class="safety-btn-group"><button class="safety-btn safety-btn-back" id="safetyBack">返回主页</button><button
+          class="safety-btn safety-btn-next" id="safetyNext" disabled>已阅读，选座</button></div>
+    </div>
+  </div>
+
+  <div class="modal" id="seatModal">
+    <div class="modal-content">
+      <div class="seat-modal-content">
+        <div class="seat-nav">
+          <div class="seat-nav-title"><span style="font-size:32px">💺</span>
+            <h2>选择座位</h2>
+          </div>
+          <div class="flight-info"><span>✈️ CA1234</span><span>🛫 北京→上海</span><span>320机型</span><span>经济舱</span></div>
+        </div>
+        <div class="seat-main-container">
+          <div class="seat-list-area">
+            <div class="seat-filter-bar"><button class="filter-btn active" data-filter="all">全部</button><button
+                class="filter-btn" data-filter="window">靠窗</button><button class="filter-btn"
+                data-filter="aisle">靠过道</button><button class="filter-btn" data-filter="exit">安全出口</button><button
+                class="filter-btn" data-filter="cheap">最优惠</button></div>
+            <div class="seat-cards-container" id="seatCardsContainer"></div>
+          </div>
+          <div class="plane-view-area">
+            <div class="plane-top-view">
+              <div class="plane-body" id="planeBody">
+                <div class="plane-nose"></div>
+                <div class="plane-wing-left"></div>
+                <div class="plane-wing-right"></div>
+                <div class="plane-tail"></div>
+                <div class="cabin-section cabin-front">前舱</div>
+                <div class="cabin-section cabin-middle">中舱</div>
+                <div class="cabin-section cabin-back">后舱</div>
+                <div id="planeSeatsContainer"></div>
+              </div>
+            </div>
+            <div class="seat-legend">
+              <div class="legend-title">座位图例</div>
+              <div class="legend-grid">
+                <div class="legend-item">
+                  <div class="legend-color" style="background:#4CAF50"></div>可选
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background:#f44336"></div>已选
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background:#795548"></div>已占
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background:#ff9800"></div>热门
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background:#2196F3"></div>优惠
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background:#ffc107"></div>出口
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="seat-bottom-bar">
+          <div class="selected-summary">
+            <div class="summary-item">已选座位：<span class="value" id="summarySeat">--</span></div>
+            <div class="summary-item">位置：<span class="value" id="summaryPos">--</span></div>
+            <div class="summary-item">加价：<span class="value" id="summaryPrice">--</span></div>
+          </div>
+          <div class="seat-btn-group"><button class="seat-btn-back" id="seatBack">返回</button><button
+              class="seat-btn-confirm" id="seatConfirm" disabled>确认选座</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="selected-seat-toast" id="seatToast"><span>✓</span><span id="toastText"></span></div>
+
+  <script>
+    // 身份证页面
+    function initIdCardPage() {
+      const idPage = document.getElementById('idCardPage');
+      const idArea = document.getElementById('idCardArea');
+      const idSuccess = document.getElementById('idSuccessBox');
+      const idBtn = document.getElementById('idConfirmBtn');
+      const mainApp = document.getElementById('mainApp');
+      idArea.onclick = () => { idArea.style.display = 'none'; idSuccess.style.display = 'block'; speakText('身份识别成功，请确认身份进入'); };
+      idBtn.onclick = () => { idPage.style.display = 'none'; mainApp.style.display = 'flex'; speakText('欢迎使用首都机场T3智慧服务系统'); };
+    }
+
+    // 机场数据
+    const AIRPORT_LOCATIONS = {
+      '值机柜台': { lng: 116.610512, lat: 40.080123, type: 'checkin', icon: '🛄', desc: '国内值机区C岛，可办理登机牌与行李托运' },
+      '安检区': { lng: 116.612534, lat: 40.079812, type: 'security', icon: '🔍', desc: '国内安检通道1-5，请提前取出电脑' },
+      '登机口A12': { lng: 116.613011, lat: 40.080408, type: 'gate', icon: '🚪', desc: 'A12登机口，步行约3分钟' },
+      '餐厅': { lng: 116.608876, lat: 40.081043, type: 'restaurant', icon: '🍽️', desc: '2层中西餐厅，营业时间6:00-22:00' },
+      '卫生间': { lng: 116.608943, lat: 40.078643, type: 'toilet', icon: '🚻', desc: '安检后2层卫生间，含母婴室' },
+      '免税店': { lng: 116.613234, lat: 40.079734, type: 'shop', icon: '🛍️', desc: '2层免税店美妆烟酒专区' },
+      '行李提取': { lng: 116.612567, lat: 40.077867, type: 'baggage', icon: '🧳', desc: '1层行李提取转盘10-15' },
+      '失物招领': { lng: 116.608543, lat: 40.078876, type: 'lost', icon: '🔎', desc: '1层服务台旁，电话010-64599567' },
+      '特殊旅客': { lng: 116.608289, lat: 40.079845, type: 'special', icon: '👴', desc: '值机区特殊旅客服务台，轮椅服务' },
+      '交通中心': { lng: 116.611734, lat: 40.077954, type: 'transport', icon: '🚌', desc: 'T3交通中心，机场快轨/大巴/出租' }
+    };
+    const CMD_MAP = { checkin: '值机柜台', security: '安检区', gate: '登机口A12', restaurant: '餐厅', toilet: '卫生间', shop: '免税店', baggage: '行李提取', lost: '失物招领', special: '特殊旅客', transport: '交通中心' };
+    const KEYWORDS = { checkin: ['值机', '登机牌', '选座'], security: ['安检'], gate: ['登机口', 'A12'], restaurant: ['餐厅', '吃饭'], toilet: ['卫生间', '厕所'], shop: ['免税店'], baggage: ['行李'], lost: ['失物'], special: ['轮椅', '老人服务'], transport: ['交通', '大巴'], elder: ['老人机', '放大字体', '大字'], normal: ['正常模式'] };
+
+    let map = null, routePolyline = null;
+    let selectedSeat = null, currentFilter = 'all';
+    const SEAT_COLS = ['A', 'B', 'C', 'D', 'E', 'F'], ROWS = 26;
+
+    function generateSeatData() {
+      let seats = [];
+      for (let r = 1; r <= ROWS; r++) {
+        SEAT_COLS.forEach((c, idx) => {
+          let type = 'available', price = 0, isWindow = (idx === 0 || idx === 5), isAisle = (idx === 2 || idx === 3);
+          if (r === 12 || r === 13) { type = 'exit'; price = 50; }
+          else if (r === 9 || r === 10) { type = 'cheap'; price = -20; }
+          else if (r === 7 || r === 8) { type = 'popular'; price = 30; }
+          else if (r === 1 || r === 25 || r === 26 || Math.random() < 0.12) type = 'occupied';
+          if (type === 'available') price = isWindow ? 20 : (isAisle ? 10 : 0);
+          seats.push({ row: r, col: c, seatNo: `${r}${c}`, type, price, isWindow, isAisle, position: isWindow ? '靠窗' : (isAisle ? '靠过道' : '中间'), cabin: r <= 8 ? '前舱' : (r <= 18 ? '中舱' : '后舱') });
+        });
+      }
+      return seats;
+    }
+    const seatData = generateSeatData();
+
+    function addChatMessage(text, type = 'system') { let box = document.getElementById('chatBox'); let div = document.createElement('div'); div.className = `chat-bubble ${type === 'user' ? 'user-bubble' : 'system-bubble'}`; div.textContent = text; box.appendChild(div); box.scrollTop = box.scrollHeight; }
+    function speakText(text) { if (!window.speechSynthesis) return; window.speechSynthesis.cancel(); let u = new SpeechSynthesisUtterance(text); u.lang = 'zh-CN'; u.rate = 1; window.speechSynthesis.speak(u); }
+    function stopAllVoice() { window.speechSynthesis.cancel(); addChatMessage('⏹️ 已停止播报'); }
+
+    // 绘制路线
+    function drawRouteTo(destName) {
+      const from = AIRPORT_LOCATIONS['值机柜台'];
+      const to = AIRPORT_LOCATIONS[destName];
+      if (!from || !to) return;
+      if (routePolyline) routePolyline.setMap(null);
+      routePolyline = new AMap.Polyline({ path: [[from.lng, from.lat], [to.lng, to.lat]], strokeColor: '#f44336', strokeWeight: 6, strokeOpacity: 0.8, zIndex: 100 });
+      routePolyline.setMap(map);
+    }
+
+    function initMap() {
+      map = new AMap.Map('mapContainer', { zoom: 16, center: [116.610512, 40.080123] });
+      map.on('complete', () => {
+        for (let name in AIRPORT_LOCATIONS) {
+          let p = AIRPORT_LOCATIONS[name];
+          let div = document.createElement('div'); div.className = `custom-marker marker-${p.type}`; div.innerText = p.icon;
+          let marker = new AMap.Marker({ position: [p.lng, p.lat], content: div, offset: new AMap.Pixel(-24, -24) });
+          marker.on('click', () => { addChatMessage(`📍 ${name}：${p.desc}`); speakText(p.desc); drawRouteTo(name); });
+          marker.setMap(map);
+        }
+      });
+    }
+
+    // 语音识别 (稳定版，无异步权限)
+    let recognition = null;
+    function initVoice() {
+      const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecog) { addChatMessage('⚠️ 当前浏览器不支持语音识别，请使用Chrome'); return; }
+      recognition = new SpeechRecog();
+      recognition.lang = 'zh-CN'; recognition.continuous = false; recognition.interimResults = false;
+      recognition.onresult = (e) => { let text = e.results[0][0].transcript.trim(); addChatMessage(`🎤 ${text}`, 'user'); processVoiceCmd(text); };
+      recognition.onerror = (err) => { if (err.error === 'not-allowed') addChatMessage('⚠️ 请允许麦克风权限'); else addChatMessage('🎤 识别失败，请重试'); };
+      document.getElementById('micBtn').addEventListener('click', () => { stopAllVoice(); try { recognition.start(); addChatMessage('🎤 正在聆听...'); } catch (e) { addChatMessage('⚠️ 语音未就绪'); } });
+    }
+    function processVoiceCmd(txt) {
+      if (KEYWORDS.elder.some(k => txt.includes(k))) { document.body.classList.add('elder-mode'); addChatMessage('✅ 老人机模式开启'); speakText('老人模式已开启'); return; }
+      if (KEYWORDS.normal.some(k => txt.includes(k))) { document.body.classList.remove('elder-mode'); addChatMessage('✅ 恢复正常模式'); speakText('已恢复正常'); return; }
+      for (let cmd in KEYWORDS) {
+        if (KEYWORDS[cmd].some(k => txt.includes(k))) {
+          if (cmd === 'checkin') { addChatMessage('🛄 打开安全须知'); speakText('打开安全须知'); setTimeout(openSafetyModal, 600); return; }
+          else if (CMD_MAP[cmd]) { let name = CMD_MAP[cmd]; let desc = AIRPORT_LOCATIONS[name]?.desc || `前往${name}`; addChatMessage(desc); speakText(desc); drawRouteTo(name); return; }
+        }
+      }
+      addChatMessage('🤔 没听清，试试说“值机”、“安检”、“登机口”');
+      speakText('请再说一次');
+    }
+
+    // 安全须知 & 选座
+    let safetyTimer = null;
+    function openSafetyModal() { let modal = document.getElementById('safetyModal'); modal.style.display = 'flex'; let s = 5, next = document.getElementById('safetyNext'); document.getElementById('countdown').innerText = s; next.disabled = true; next.classList.remove('active'); safetyTimer = setInterval(() => { s--; document.getElementById('countdown').innerText = s; if (s <= 0) { clearInterval(safetyTimer); next.disabled = false; next.classList.add('active'); } }, 1000); }
+    function closeSafetyModal() { document.getElementById('safetyModal').style.display = 'none'; if (safetyTimer) clearInterval(safetyTimer); }
+    function openSeatModal() { closeSafetyModal(); document.getElementById('seatModal').style.display = 'flex'; selectedSeat = null; currentFilter = 'all'; updateSummary(); renderSeatCards(); renderPlaneView(); document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.querySelector('.filter-btn[data-filter="all"]').classList.add('active'); }
+    function closeSeatModal() { document.getElementById('seatModal').style.display = 'none'; }
+    function updateSummary() { let s1 = document.getElementById('summarySeat'), s2 = document.getElementById('summaryPos'), s3 = document.getElementById('summaryPrice'), btn = document.getElementById('seatConfirm'); if (selectedSeat) { s1.innerText = selectedSeat.seatNo; s2.innerText = `${selectedSeat.position}·${selectedSeat.cabin}`; s3.innerText = selectedSeat.price > 0 ? `+¥${selectedSeat.price}` : (selectedSeat.price < 0 ? `-¥${-selectedSeat.price}` : '免费'); btn.disabled = false; } else { s1.innerText = '--'; s2.innerText = '--'; s3.innerText = '--'; btn.disabled = true; } }
+    function getFilteredSeats() { if (currentFilter === 'all') return seatData.filter(s => s.type !== 'occupied'); return seatData.filter(s => { if (s.type === 'occupied') return false; if (currentFilter === 'window') return s.isWindow; if (currentFilter === 'aisle') return s.isAisle; if (currentFilter === 'exit') return s.type === 'exit'; if (currentFilter === 'cheap') return s.type === 'cheap'; return true; }); }
+    function renderSeatCards() { let list = getFilteredSeats(); let container = document.getElementById('seatCardsContainer'); container.innerHTML = list.map(s => { let sel = selectedSeat?.seatNo === s.seatNo; let label = '可选', cls = 'seat-type-available'; if (s.type === 'popular') { label = '热门'; cls = 'seat-type-popular'; } else if (s.type === 'cheap') { label = '特惠'; cls = 'seat-type-cheap'; } else if (s.type === 'exit') { label = '出口'; cls = 'seat-type-exit'; } else if (s.type === 'occupied') { label = '已占'; cls = 'seat-type-occupied'; } let priceTxt = s.type === 'occupied' ? '❌已售' : (s.price > 0 ? `+¥${s.price}` : (s.price < 0 ? `-¥${-s.price}` : '免费')); return `<div class="seat-card ${sel ? 'selected' : ''}" onclick="selectSeat('${s.seatNo}')"><div class="seat-card-header"><span class="seat-number">${s.seatNo}</span><span class="seat-type-badge ${cls}">${label}</span></div><div class="seat-price">${priceTxt}</div></div>`; }).join(''); }
+    function renderPlaneView() { let container = document.getElementById('planeSeatsContainer'); container.innerHTML = ''; let bodyW = 360, bodyH = 620, seatW = 22, seatGap = 4, aisleW = 28; let leftStart = (bodyW - (3 * seatW + 2 * seatGap) - aisleW - (3 * seatW + 2 * seatGap)) / 2; let rightStart = leftStart + 3 * seatW + 2 * seatGap + aisleW; let topStart = 90, rowH = (bodyH - topStart - 120) / ROWS; seatData.forEach(seat => { if (seat.type === 'occupied') return; let dot = document.createElement('div'); dot.className = `seat-dot ${seat.type} ${selectedSeat?.seatNo === seat.seatNo ? 'selected' : ''}`; dot.textContent = seat.col; let colIdx = SEAT_COLS.indexOf(seat.col); let x = colIdx < 3 ? leftStart + colIdx * (seatW + seatGap) : rightStart + (colIdx - 3) * (seatW + seatGap); let y = topStart + (seat.row - 1) * rowH; dot.style.left = `${x}px`; dot.style.top = `${y}px`; dot.style.width = `${seatW}px`; dot.style.height = `${seatW}px`; dot.onclick = () => selectSeat(seat.seatNo); container.appendChild(dot); }); }
+    window.selectSeat = function (no) { let s = seatData.find(x => x.seatNo === no); if (!s || s.type === 'occupied') return; selectedSeat = s; let toast = document.getElementById('seatToast'); document.getElementById('toastText').innerText = `✓ 已选座位 ${no}`; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 1800); speakText(`已选择座位${s.seatNo}`); renderSeatCards(); renderPlaneView(); updateSummary(); };
+    function confirmSeat() { if (!selectedSeat) { alert('请先选择座位'); return; } alert(`✅ 值机成功！\n座位：${selectedSeat.seatNo}\n祝您旅途愉快！`); closeSeatModal(); }
+
+    // 事件绑定
+    document.getElementById('stopBtn').onclick = stopAllVoice;
+    document.querySelector('.func-btn-checkin').onclick = () => { addChatMessage('🛄 打开安全须知'); speakText('打开安全须知'); setTimeout(openSafetyModal, 600); };
+    document.getElementById('safetyBack').onclick = closeSafetyModal; document.getElementById('safetyClose').onclick = closeSafetyModal;
+    document.getElementById('safetyNext').onclick = openSeatModal; document.getElementById('seatBack').onclick = closeSeatModal;
+    document.getElementById('seatConfirm').onclick = confirmSeat;
+    document.querySelectorAll('.filter-btn').forEach(b => { b.addEventListener('click', () => { document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); currentFilter = b.dataset.filter; renderSeatCards(); }); });
+    document.querySelectorAll('.func-btn[data-cmd]').forEach(btn => { btn.addEventListener('click', () => { let cmd = btn.dataset.cmd; if (cmd === 'checkin') { addChatMessage('🛄 打开安全须知'); speakText('打开安全须知'); setTimeout(openSafetyModal, 600); } else if (CMD_MAP[cmd]) { let name = CMD_MAP[cmd]; let desc = AIRPORT_LOCATIONS[name]?.desc || `前往${name}`; addChatMessage(desc); speakText(desc); drawRouteTo(name); } }); });
+
+    window.onload = () => {
+      initIdCardPage();
+      let script = document.createElement('script'); script.src = 'https://webapi.amap.com/maps?v=2.0&key=37998adb2d5488949647812aebeaf528'; script.onload = () => initMap(); document.head.appendChild(script);
+      initVoice();
+    };
+  </script>
+</body>
+
+</html>
