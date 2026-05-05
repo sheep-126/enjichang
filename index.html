@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>首都机场T3智慧服务 · 语音完美版</title>
+  <title>首都机场T3智慧服务 · 布局修正版</title>
   <style>
     * {
       margin: 0;
@@ -153,7 +153,7 @@
       overflow: hidden;
     }
 
-    /* 左侧导航 (加宽) */
+    /* 左侧导航 */
     .left-panel {
       width: 310px;
       flex-shrink: 0;
@@ -299,7 +299,7 @@
       color: #0a2f5a;
     }
 
-    /* 右侧对话 (加宽) */
+    /* 右侧对话 */
     .right-panel {
       width: 460px;
       flex-shrink: 0;
@@ -525,7 +525,7 @@
       color: white;
     }
 
-    /* 选座模块 修复机舱标签+座位对齐 */
+    /* ========== 选座模块（布局修正版） ========== */
     .seat-modal-content {
       display: flex;
       flex-direction: column;
@@ -658,6 +658,7 @@
       color: #1565C0;
     }
 
+    /* 右侧飞机俯视图（修正对齐） */
     .plane-view-area {
       flex: 1;
       background: #eef4fc;
@@ -677,6 +678,7 @@
       border-radius: 100px 100px 60px 60px;
       border: 5px solid #1565C0;
       margin-bottom: 20px;
+      z-index: 1;
     }
 
     .plane-nose {
@@ -688,6 +690,7 @@
       background: #1976d2;
       border-radius: 50%;
       transform: translateX(-50%);
+      z-index: 2;
     }
 
     .plane-tail {
@@ -699,6 +702,7 @@
       background: #0d47a1;
       border-radius: 20px;
       transform: translateX(-50%);
+      z-index: 2;
     }
 
     .plane-wing-left {
@@ -710,6 +714,7 @@
       background: #1976d2;
       border-radius: 30px 0 0 30px;
       transform: rotate(-10deg);
+      z-index: 2;
     }
 
     .plane-wing-right {
@@ -721,25 +726,28 @@
       background: #1976d2;
       border-radius: 0 30px 30px 0;
       transform: rotate(10deg);
+      z-index: 2;
     }
 
-    /* 已修正：前中后舱标签居中不偏移 */
+    /* 舱位标签（不遮挡座位，不偏移） */
     .cabin-section {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       padding: 4px 18px;
       border-radius: 12px;
-      background: #ffffff;
+      background: white;
       border: 2px solid #1565C0;
       font-size: 14px;
       font-weight: bold;
       color: #0d47a1;
       z-index: 10;
+      pointer-events: none;
+      white-space: nowrap;
     }
 
     .cabin-front {
-      top: 10%;
+      top: 8%;
     }
 
     .cabin-middle {
@@ -747,15 +755,17 @@
     }
 
     .cabin-back {
-      bottom: 10%;
+      bottom: 12%;
     }
 
+    /* 座位容器 - 优化垂直范围 */
     #planeSeatsContainer {
       position: absolute;
-      top: 8%;
+      top: 9%;
       left: 5%;
       width: 90%;
-      height: 84%;
+      height: 82%;
+      z-index: 15;
     }
 
     .seat-dot {
@@ -997,7 +1007,7 @@
     </div>
   </div>
 
-  <!-- 选座弹窗 -->
+  <!-- 选座弹窗（布局已修正） -->
   <div class="modal" id="seatModal">
     <div class="modal-content">
       <div class="seat-modal-content">
@@ -1021,7 +1031,6 @@
               <div class="plane-wing-left"></div>
               <div class="plane-wing-right"></div>
               <div class="plane-tail"></div>
-              <!-- 已校准不偏移 -->
               <div class="cabin-section cabin-front">前舱</div>
               <div class="cabin-section cabin-middle">中舱</div>
               <div class="cabin-section cabin-back">后舱</div>
@@ -1159,9 +1168,7 @@
       const SpeechRecog = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecog) { addChatMessage('❌ 请使用Chrome或Edge浏览器'); return; }
       recognition = new SpeechRecog();
-      recognition.lang = 'zh-CN';
-      recognition.continuous = false;
-      recognition.interimResults = false;
+      recognition.lang = 'zh-CN'; recognition.continuous = false; recognition.interimResults = false;
 
       recognition.onstart = () => addChatMessage('🎤 聆听中，请说话...');
       recognition.onresult = (e) => {
@@ -1201,65 +1208,27 @@
     function closeSafetyModal() { document.getElementById('safetyModal').style.display = 'none'; if (safetyTimer) clearInterval(safetyTimer); }
     function openSeatModal() { closeSafetyModal(); document.getElementById('seatModal').style.display = 'flex'; selectedSeat = null; currentFilter = 'all'; updateSummary(); renderSeatCards(); renderPlaneView(); document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.querySelector('.filter-btn[data-filter="all"]').classList.add('active'); }
     function closeSeatModal() { document.getElementById('seatModal').style.display = 'none'; }
-    function updateSummary() {
-      let s1 = document.getElementById('summarySeat'), s2 = document.getElementById('summaryPos'), s3 = document.getElementById('summaryPrice'), btn = document.getElementById('seatConfirm');
-      if (selectedSeat) {
-        s1.innerText = selectedSeat.seatNo;
-        s2.innerText = `${selectedSeat.position}·${selectedSeat.cabin}`;
-        s3.innerText = selectedSeat.price > 0 ? `+¥${selectedSeat.price}` : (selectedSeat.price < 0 ? `-¥${-selectedSeat.price}` : '免费');
-        btn.disabled = false;
-      } else {
-        s1.innerText = '--';
-        s2.innerText = '--';
-        s3.innerText = '--';
-        btn.disabled = true;
-      }
-    }
-    function getFilteredSeats() {
-      if (currentFilter === 'all') return seatData.filter(s => s.type !== 'occupied');
-      return seatData.filter(s => {
-        if (s.type === 'occupied') return false;
-        if (currentFilter === 'window') return s.isWindow;
-        if (currentFilter === 'aisle') return s.isAisle;
-        if (currentFilter === 'exit') return s.type === 'exit';
-        if (currentFilter === 'cheap') return s.type === 'cheap';
-        return true;
-      });
-    }
-    function renderSeatCards() {
-      let list = getFilteredSeats();
-      let container = document.getElementById('seatCardsContainer');
-      container.innerHTML = list.map(s => {
-        let sel = selectedSeat?.seatNo === s.seatNo;
-        let label = '可选', cls = 'seat-type-available';
-        if (s.type === 'popular') { label = '热门'; cls = 'seat-type-popular'; }
-        else if (s.type === 'cheap') { label = '特惠'; cls = 'seat-type-cheap'; }
-        else if (s.type === 'exit') { label = '出口'; cls = 'seat-type-exit'; }
-        else if (s.type === 'occupied') { label = '已占'; cls = 'seat-type-occupied'; }
-        let priceTxt = s.type === 'occupied' ? '已售' : (s.price > 0 ? `+¥${s.price}` : (s.price < 0 ? `-¥${-s.price}` : '免费'));
-        return `<div class="seat-card ${sel ? 'selected' : ''}" onclick="selectSeat('${s.seatNo}')">
-              <div class="seat-card-header">
-                <span class="seat-number">${s.seatNo}</span>
-                <span class="seat-type-badge ${cls}">${label}</span>
-              </div>
-              <div class="seat-price">${priceTxt}</div>
-            </div>`;
-      }).join('');
-    }
+    function updateSummary() { let s1 = document.getElementById('summarySeat'), s2 = document.getElementById('summaryPos'), s3 = document.getElementById('summaryPrice'), btn = document.getElementById('seatConfirm'); if (selectedSeat) { s1.innerText = selectedSeat.seatNo; s2.innerText = `${selectedSeat.position}·${selectedSeat.cabin}`; s3.innerText = selectedSeat.price > 0 ? `+¥${selectedSeat.price}` : (selectedSeat.price < 0 ? `-¥${-selectedSeat.price}` : '免费'); btn.disabled = false; } else { s1.innerText = '--'; s2.innerText = '--'; s3.innerText = '--'; btn.disabled = true; } }
+    function getFilteredSeats() { if (currentFilter === 'all') return seatData.filter(s => s.type !== 'occupied'); return seatData.filter(s => { if (s.type === 'occupied') return false; if (currentFilter === 'window') return s.isWindow; if (currentFilter === 'aisle') return s.isAisle; if (currentFilter === 'exit') return s.type === 'exit'; if (currentFilter === 'cheap') return s.type === 'cheap'; return true; }); }
+    function renderSeatCards() { let list = getFilteredSeats(); let container = document.getElementById('seatCardsContainer'); container.innerHTML = list.map(s => { let sel = selectedSeat?.seatNo === s.seatNo; let label = '可选', cls = 'seat-type-available'; if (s.type === 'popular') { label = '热门'; cls = 'seat-type-popular'; } else if (s.type === 'cheap') { label = '特惠'; cls = 'seat-type-cheap'; } else if (s.type === 'exit') { label = '出口'; cls = 'seat-type-exit'; } else if (s.type === 'occupied') { label = '已占'; cls = 'seat-type-occupied'; } let priceTxt = s.type === 'occupied' ? '已售' : (s.price > 0 ? `+¥${s.price}` : (s.price < 0 ? `-¥${-s.price}` : '免费')); return `<div class="seat-card ${sel ? 'selected' : ''}" onclick="selectSeat('${s.seatNo}')"><div class="seat-card-header"><span class="seat-number">${s.seatNo}</span><span class="seat-type-badge ${cls}">${label}</span></div><div class="seat-price">${priceTxt}</div></div>`; }).join(''); }
+
+    // 修正后的 renderPlaneView：座位对齐更精准
     function renderPlaneView() {
       let container = document.getElementById('planeSeatsContainer');
       container.innerHTML = '';
-      let bodyW = 380, bodyH = 620, seatW = 22, seatGap = 4, aisleW = 28;
-      let leftStart = (bodyW - (3 * seatW + 2 * seatGap) - aisleW - (3 * seatW + 2 * seatGap)) / 2;
-      let rightStart = leftStart + 3 * seatW + 2 * seatGap + aisleW;
-      let topStart = 90, rowH = (bodyH - topStart - 120) / ROWS;
+      let bodyW = 380, bodyH = 620, seatW = 24, seatGap = 6, aisleW = 28;
+      let leftGroupStart = (bodyW - (3 * seatW + 2 * seatGap) - aisleW - (3 * seatW + 2 * seatGap)) / 2;
+      let rightGroupStart = leftGroupStart + 3 * seatW + 2 * seatGap + aisleW;
+      let topStart = 95;
+      let rowRangeHeight = bodyH - topStart - 105; // 可用高度
+      let rowH = rowRangeHeight / ROWS;
       seatData.forEach(seat => {
         if (seat.type === 'occupied') return;
         let dot = document.createElement('div');
         dot.className = `seat-dot ${seat.type} ${selectedSeat?.seatNo === seat.seatNo ? 'selected' : ''}`;
         dot.textContent = seat.col;
         let colIdx = SEAT_COLS.indexOf(seat.col);
-        let x = colIdx < 3 ? leftStart + colIdx * (seatW + seatGap) : rightStart + (colIdx - 3) * (seatW + seatGap);
+        let x = colIdx < 3 ? leftGroupStart + colIdx * (seatW + seatGap) : rightGroupStart + (colIdx - 3) * (seatW + seatGap);
         let y = topStart + (seat.row - 1) * rowH;
         dot.style.left = `${x}px`;
         dot.style.top = `${y}px`;
@@ -1269,56 +1238,17 @@
         container.appendChild(dot);
       });
     }
-    window.selectSeat = function (no) {
-      let s = seatData.find(x => x.seatNo === no);
-      if (!s || s.type === 'occupied') return;
-      selectedSeat = s;
-      let toast = document.getElementById('seatToast');
-      document.getElementById('toastText').innerText = `✓ 已选座位 ${no}`;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 1800);
-      speakText(`已选择座位${s.seatNo}`);
-      renderSeatCards();
-      renderPlaneView();
-      updateSummary();
-    };
-    function confirmSeat() {
-      if (!selectedSeat) { alert('请先选择座位'); return; }
-      alert(`✅ 值机成功！\n座位：${selectedSeat.seatNo}\n祝您旅途愉快！`);
-      closeSeatModal();
-    }
+
+    window.selectSeat = function (no) { let s = seatData.find(x => x.seatNo === no); if (!s || s.type === 'occupied') return; selectedSeat = s; let toast = document.getElementById('seatToast'); document.getElementById('toastText').innerText = `✓ 已选座位 ${no}`; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 1800); speakText(`已选择座位${s.seatNo}`); renderSeatCards(); renderPlaneView(); updateSummary(); };
+    function confirmSeat() { if (!selectedSeat) { alert('请先选择座位'); return; } alert(`✅ 值机成功！\n座位：${selectedSeat.seatNo}\n祝您旅途愉快！`); closeSeatModal(); }
 
     // -------------------- 事件绑定 --------------------
     document.getElementById('stopBtn').onclick = stopAllVoice;
-    document.querySelectorAll('.func-btn[data-cmd]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        let cmd = btn.dataset.cmd;
-        if (cmd === 'checkin') {
-          addChatMessage('🛄 打开安全须知');
-          speakText('打开安全须知');
-          setTimeout(openSafetyModal, 600);
-        } else if (CMD_MAP[cmd]) {
-          let name = CMD_MAP[cmd];
-          let desc = AIRPORT_LOCATIONS[name]?.desc || `前往${name}`;
-          addChatMessage(desc);
-          speakText(desc);
-          drawRouteTo(name);
-        }
-      });
-    });
-    document.getElementById('safetyBack').onclick = closeSafetyModal;
-    document.getElementById('safetyClose').onclick = closeSafetyModal;
-    document.getElementById('safetyNext').onclick = openSeatModal;
-    document.getElementById('seatBack').onclick = closeSeatModal;
+    document.querySelectorAll('.func-btn[data-cmd]').forEach(btn => { btn.addEventListener('click', () => { let cmd = btn.dataset.cmd; if (cmd === 'checkin') { addChatMessage('🛄 打开安全须知'); speakText('打开安全须知'); setTimeout(openSafetyModal, 600); } else if (CMD_MAP[cmd]) { let name = CMD_MAP[cmd]; let desc = AIRPORT_LOCATIONS[name]?.desc || `前往${name}`; addChatMessage(desc); speakText(desc); drawRouteTo(name); } }); });
+    document.getElementById('safetyBack').onclick = closeSafetyModal; document.getElementById('safetyClose').onclick = closeSafetyModal;
+    document.getElementById('safetyNext').onclick = openSeatModal; document.getElementById('seatBack').onclick = closeSeatModal;
     document.getElementById('seatConfirm').onclick = confirmSeat;
-    document.querySelectorAll('.filter-btn').forEach(b => {
-      b.addEventListener('click', () => {
-        document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active'));
-        b.classList.add('active');
-        currentFilter = b.dataset.filter;
-        renderSeatCards();
-      });
-    });
+    document.querySelectorAll('.filter-btn').forEach(b => { b.addEventListener('click', () => { document.querySelectorAll('.filter-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); currentFilter = b.dataset.filter; renderSeatCards(); }); });
 
     window.onload = () => {
       initIdCard();
